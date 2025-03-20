@@ -1,3 +1,4 @@
+
 * {
     margin: 0;
     padding: 0;
@@ -163,11 +164,142 @@ input:focus {
     background: #c82333;
 }
 
-.welcome-card {
-    text-align: center;
+.todo-container {
+    width: 100%;
+    max-width: 600px;
+    padding: 20px;
 }
 
-.welcome-text {
-    color: #666;
+.auth-card, .todo-container {
+    background: white;
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+    text-align: center;
+    color: #333;
     margin-bottom: 2rem;
+}
+
+.todo-input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input {
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+    flex: 1;
+}
+
+input:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.primary-btn {
+    padding: 0.8rem;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.primary-btn:hover {
+    background: #0056b3;
+}
+
+.logout-btn {
+    width: 100%;
+    margin-bottom: 20px;
+    background: #dc3545;
+}
+
+.logout-btn:hover {
+    background: #c82333;
+}
+
+.todo-list {
+    list-style: none;
+    padding: 0;
+}
+
+.todo-list li {
+    background: #f9f9f9;
+    margin: 10px 0;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.todo-list li span:first-child {
+    flex: 1;
+    word-break: break-word;
+    max-width: 100%;
+}
+
+.todo-list li .timestamp {
+    font-size: 0.8rem;
+    color: #777;
+    white-space: nowrap;
+}
+
+.todo-list li button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.edit-btn {
+    background: #007bff;
+    color: white;
+}
+
+.edit-btn:hover {
+    background: #0056b3;
+}
+
+.delete-btn {
+    background: #dc3545;
+    color: white;
+}
+
+.delete-btn:hover {
+    background: #c82333;
+}
+
+.todo-list li {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 500px) {
+    .todo-container {
+        padding: 1rem;
+    }
+    .todo-input-group {
+        flex-direction: column;
+    }
+    .primary-btn {
+        width: 100%;
+    }
 }

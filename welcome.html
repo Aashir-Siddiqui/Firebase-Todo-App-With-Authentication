@@ -1,30 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Welcome</title>
+    <title>Todo App</title>
 </head>
-
 <body>
-    <div class="container">
-        <!-- <div class="auth-card welcome-card">
-            <h1 class="title">Welcome!</h1>
-            <p class="welcome-text">You're successfully logged in.</p>
-            <button id="logoutBtn" class="primary-btn">Logout</button>
-        </div> -->
-
-        <h1>To-Do App</h1>
-        <input type="text" id="todo">
-        <button id="addTodo">Add</button>
-        <ul id="todoList"></ul>
+    <div class="todo-container">
+        <button id="logoutBtn" class="primary-btn logout-btn">Logout</button>
+        <div class="todo-container">
+            <h1 class="title">Your Todos</h1>
+            <div class="todo-input-group">
+                <input type="text" id="todo" placeholder="Add New Todo...">
+                <button id="addTodo" class="primary-btn">Add Todo</button>
+            </div>
+            <ul id="todoList" class="todo-list"></ul>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="module" src="firebase.js"></script>
     <script type="module" src="script.js"></script>
 </body>
-
 </html>

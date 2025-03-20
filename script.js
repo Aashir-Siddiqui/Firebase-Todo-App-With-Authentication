@@ -1,4 +1,8 @@
-import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendEmailVerification, googleProvider, GoogleAuthProvider, signInWithPopup, db, doc, setDoc, collection, addDoc, getDocs, increment, onSnapshot, deleteDoc, updateDoc, serverTimestamp } from "./firebase.js";
+import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendEmailVerification, googleProvider, GoogleAuthProvider, signInWithPopup, db, doc, collection, addDoc, onSnapshot, deleteDoc, updateDoc, serverTimestamp } from "./firebase.js";
+
+const showError = (title, text) => Swal.fire({ icon: "error", title, text });
+const showSuccess = (title, text) => Swal.fire({ icon: "success", title, text });
+const showWarning = (title, text) => Swal.fire({ icon: "warning", title, text });
 
 const signupBtn = document.getElementById("signupBtn");
 if (signupBtn) {
@@ -7,49 +11,23 @@ if (signupBtn) {
         const password = document.getElementById("su-password");
 
         if (!email || !password || !email.value || !password.value) {
-            console.log("Please fill in both email and password fields.");
-            Swal.fire({
-                icon: "error",
-                title: "Missing Fields",
-                text: "Please enter email and password!",
-            });
-            return;
+            return showError("Missing Fields", "Please enter email and password!")
         }
 
         if (password.value.length < 6) {
-            Swal.fire({
-                icon: "error",
-                title: "Weak Password",
-                text: `Password must be at least 6 characters long! Current length: ${password.value.length}`,
-            });
-            return;
+            return showError("Weak Password", `Password must be at least 6 characters long! Current length: ${password.value.length}`)
         }
 
         createUserWithEmailAndPassword(auth, email.value, password.value)
             .then((userCredential) => {
                 const user = userCredential.user;
-                console.log("Signed up successfully:", user.email);
-                Swal.fire({
-                    title: "Signup Successful",
-                    icon: "success",
-                    text: `Welcome, ${user.email}!`,
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        setTimeout(() => {
-                            window.location.href = '/login.html';
-                        }, 1000);
-                    }
-                });
+                showSuccess("Signup Successful", `Welcome, ${user.email}!`)
+                    .then((result) => {
+                        if (result.isConfirmed) { setTimeout(() => { window.location.href = '/login.html'; }, 1000); }
+                    });
             })
             .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                console.log(errorCode, errorMessage);
-                Swal.fire({
-                    icon: "error",
-                    title: "Signup Failed",
-                    text: errorMessage,
-                });
+                showError("Signup Failed", error.message);
             });
     });
 }
@@ -61,43 +39,23 @@ if (signinBtn) {
         const password = document.getElementById("si-password");
 
         if (!email || !password || !email.value || !password.value) {
-            Swal.fire({
-                icon: "error",
-                title: "Missing Fields",
-                text: "Please enter email and password!",
-            });
-            return;
+            return showError("Missing Fields", "Please enter email and password!")
         }
 
         if (password.value.length < 6) {
-            Swal.fire({
-                icon: "error",
-                title: "Weak Password",
-                text: `Password must be at least 6 characters long! Current length: ${password.value.length}`,
-            });
-            return;
+            return showError("Weak Password", `Password must be at least 6 characters long! Current length: ${password.value.length}`)
         }
 
         signInWithEmailAndPassword(auth, email.value, password.value)
             .then((userCredential) => {
                 const user = userCredential.user;
-                console.log("Signed in successfully:", user.email);
-                Swal.fire({
-                    title: "Login Successful",
-                    icon: "success",
-                    text: `Welcome back, ${user.email}!`,
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        setTimeout(() => {
-                            window.location.href = '/welcome.html';
-                        }, 1000);
-                    }
-                });
+                showSuccess("Login Successful", `Welcome back, ${user.email}!`)
+                    .then((result) => {
+                        if (result.isConfirmed) { setTimeout(() => { window.location.href = '/welcome.html'; }, 1000); }
+                    });
 
             })
             .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
                 Swal.fire({
                     icon: "error",
                     title: "Wrong Credentials",
@@ -108,65 +66,43 @@ if (signinBtn) {
     });
 }
 
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        const uid = user.uid;
-        console.log("user", user);
-    } else {
-        console.log("user does not exist");
-    }
-});
 
 const logoutBtn = document.getElementById("logoutBtn");
 if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
         if (!auth.currentUser) {
-            Swal.fire({
-                title: "No User Signed In!",
-                text: "You need to sign in first to logout.",
-                icon: "warning"
-            });
-            return;
+            return showWarning("No User Signed In!", "You need to sign in first to logout.")
         }
         signOut(auth)
             .then(() => {
-                console.log("Logout successful");
-                Swal.fire({
-                    title: "Logout Successful!",
-                    icon: "success"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        setTimeout(() => {
-                            window.location.href = '/login.html';
-                        }, 1000);
-                    }
-                });
+                showSuccess("Logout Successful")
+                    .then((result) => {
+                        if (result.isConfirmed) { setTimeout(() => { window.location.href = '/login.html' }, 1000) }
+                    });
             })
             .catch((error) => {
-                console.log("Error during logout:", error);
-                Swal.fire({
-                    title: "Logout Failed!",
-                    text: error.message,
-                    icon: "error"
-                });
+                showError("Logout Failed", error.message);
             })
     });
 }
 
 
-let verifyEmail = document.getElementById("verifyEmail")
-
+const verifyEmail = document.getElementById("verifyEmail")
 if (verifyEmail) {
     verifyEmail.addEventListener("click", () => {
+        if (!auth.currentUser) return showError("No User");
         sendEmailVerification(auth.currentUser)
             .then(() => {
-                console.log("sent")
-            });
+                showSuccess("Verification Sent", "Check email");
+            })
+            .catch((error) => {
+                showError("Verification Failed", error.message);
+            })
     })
 }
 
 
-let googleBtn = document.getElementById("googleBtn");
+const googleBtn = document.getElementById("googleBtn");
 if (googleBtn) {
     googleBtn.addEventListener("click", () => {
         signInWithPopup(auth, googleProvider)
@@ -182,50 +118,27 @@ if (googleBtn) {
                     icon: "success",
                     text: `Welcome, ${user.email}!`,
                 }).then((result) => {
-                    if (result.isConfirmed) {
-                        setTimeout(() => {
-                            window.location.href = '/welcome.html';
-                        }, 1000);
-                    }
+                    if (result.isConfirmed) { setTimeout(() => { window.location.href = '/welcome.html' }, 1000) }
                 });
             })
             .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                console.log("Google Sign-In Error:", errorCode, errorMessage);
-                Swal.fire({
-                    icon: "error",
-                    title: "Google Sign-In Failed",
-                    text: errorMessage,
-                });
+                showError("Google Sign-In Failed", error.message);
             });
     });
 }
 
-let todoList = document.getElementById('todoList');
 
-let addTodo = document.getElementById('addTodo');
+const todoList = document.getElementById('todoList');
+
+const addTodo = document.getElementById('addTodo');
 if (addTodo) {
     addTodo.addEventListener("click", async () => {
-        let todo = document.getElementById("todo");
 
-        if (!todo || !todo.value) {
-            Swal.fire({
-                icon: "error",
-                title: "Todo Khali Hai",
-                text: "Kuch toh likh bhai!",
-            });
-            return;
-        }
+        const todo = document.getElementById("todo");
 
-        if (!auth.currentUser) {
-            Swal.fire({
-                icon: "error",
-                title: "Login Kar Pehle",
-                text: "Todo add karne ke liye login zaroori hai!",
-            });
-            return;
-        }
+        if (!todo || !todo.value) return showError("Todo is empty", "Write something!");
+
+        if (!auth.currentUser) { return showError("Log in first", "Login is required to add a todo!") }
 
         const ref = collection(db, "todos");
         try {
@@ -234,110 +147,93 @@ if (addTodo) {
                 uid: auth.currentUser.uid,
                 createdAt: serverTimestamp()
             });
-            console.log("Todo Added");
-            Swal.fire({
-                icon: "success",
-                title: "Todo Add Ho Gaya!",
-                text: "Naya todo list mein daal diya.",
-            });
             todo.value = "";
         }
         catch (error) {
-            console.log("Error adding todo:", error.message);
-            Swal.fire({
-                icon: "error",
-                title: "Todo Add Nahi Hua",
-                text: error.message,
-            });
+            showError("Todo is not added", error.message)
         }
     });
 }
 
-let getTodos = () => {
+
+const getTodos = () => {
     onSnapshot(collection(db, "todos"), (snapshot) => {
-        todoList.innerHTML = ""
-        snapshot.docChanges().forEach((change) => {
-            console.log("change", change.type)
-        });
+        todoList.innerHTML = "";
+        let todos = [];
         snapshot.forEach((doc) => {
             let { todo, uid, createdAt } = doc.data();
-            console.log("createdAt", new Date(createdAt).toDateString())
             if (auth.currentUser && uid === auth.currentUser.uid) {
-                todoList.innerHTML += `
-                        <li> 
-                            ${todo} 
-                            <button class="edit-btn" data-id="${doc.id}" data-todo="${todo}">Edit</button>
-                            <button class="delete-btn" data-id="${doc.id}">Del</button>
-                        </li>`;
+                todos.push({ id: doc.id, todo, createdAt });
             }
         });
+        todos.sort((a, b) => b.createdAt - a.createdAt);
+        todos.forEach(({ id, todo, createdAt }) => {
+            todoList.innerHTML += `
+            <div><span class="timestamp">${new Date(createdAt.toDate()).toLocaleString()}</span></div>
+                <li>
+                    <span>${todo}</span>
+                    <button class="edit-btn" data-id="${id}" data-todo="${todo}">Edit</button>
+                    <button class="delete-btn" data-id="${id}">Del</button>
+                </li>`;
+        });
+
+        document.querySelectorAll('.edit-btn').forEach(btn => btn.removeEventListener('click', editTodo));
+        document.querySelectorAll('.delete-btn').forEach(btn => btn.removeEventListener('click', delTodo));
+
         document.querySelectorAll('.edit-btn').forEach((btn) => {
-            btn.addEventListener('click', async () => {
-                const id = btn.getAttribute('data-id');
-                const currentTodo = btn.getAttribute('data-todo');
-                await editTodo(id, currentTodo);
-            });
+            btn.addEventListener('click', () => editTodo(btn.getAttribute('data-id'), btn.getAttribute('data-todo')));
         });
         document.querySelectorAll('.delete-btn').forEach((btn) => {
-            btn.addEventListener('click', async () => {
-                const id = btn.getAttribute('data-id');
-                await delTodo(id);
-            });
+            btn.addEventListener('click', () => delTodo(btn.getAttribute('data-id')));
         });
     });
 }
 getTodos()
 
-let editTodo = async (id, currentTodo) => {
-    const newTodo = prompt("Naya todo kya daalna hai?", currentTodo);
-    if (!newTodo) return;
 
-    try {
-        await updateDoc(doc(db, "todos", id), {
-            todo: newTodo,
-            uid: auth.currentUser.uid,
-            updatedAt: serverTimestamp()
-        });
-        console.log("Todo Updated");
-        Swal.fire({
-            icon: "success",
-            title: "Todo Update Ho Gaya!",
-            text: "List mein change kar diya.",
-        });
-    } catch (error) {
-        console.log("Error updating todo:", error.message);
-        Swal.fire({
-            icon: "error",
-            title: "Update Nahi Hua",
-            text: error.message,
-        });
-    }
+const editTodo = async (id, currentTodo) => {
+    Swal.fire({
+        title: "Edit Todo",
+        input: "text",
+        inputValue: currentTodo,
+        showCancelButton: true,
+        inputValidator: (value) => {
+            if (!value) return "Write something!";
+        }
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            try {
+                await updateDoc(doc(db, "todos", id), {
+                    todo: result.value,
+                    uid: auth.currentUser.uid,
+                    updatedAt: serverTimestamp()
+                });
+                showSuccess("Todo Updated", "The list has changed!");
+            } catch (error) {
+                showError("Update Nahi Hua", error.message);
+            }
+        }
+    });
 }
 
-let delTodo = async (id) => {
-    if (!auth.currentUser) {
-        Swal.fire({
-            icon: "error",
-            title: "Login Kar Pehle",
-            text: "Todo delete karne ke liye login zaroori hai!",
-        });
-        return;
-    }
+
+const delTodo = async (id) => {
+    if (!auth.currentUser) { return showError("Log in first", "Login is required to delete a todo!") }
     try {
         await deleteDoc(doc(db, "todos", id));
-        console.log("Todo Deleted");
-        Swal.fire({
-            icon: "success",
-            title: "Todo Delete Ho Gaya!",
-            text: "List se hata diya.",
-        });
+        showSuccess("Todo Deleted", "Removed from the list");
     } catch (error) {
-        console.log("Error deleting todo:", error.message);
-        Swal.fire({
-            icon: "error",
-            title: "Delete Nahi Hua",
-            text: error.message,
-        });
+        showError("Not deleted", error.message);
     }
 }
 
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log("User logged in:", user);
+        if (window.location.pathname === "/welcome.html") {
+            getTodos();
+        }
+    } else {
+        console.log("User does not exist");
+    }
+});
