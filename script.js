@@ -51,7 +51,7 @@ if (signinBtn) {
                 const user = userCredential.user;
                 showSuccess("Login Successful", `Welcome back, ${user.email}!`)
                     .then((result) => {
-                        if (result.isConfirmed) { setTimeout(() => { window.location.href = '/welcome.html'; }, 1000); }
+                        if (result.isConfirmed) { setTimeout(() => { window.location.href = '/todo.html'; }, 1000); }
                     });
 
             })
@@ -107,19 +107,10 @@ if (googleBtn) {
     googleBtn.addEventListener("click", () => {
         signInWithPopup(auth, googleProvider)
             .then((result) => {
-                const credential = GoogleAuthProvider.credentialFromResult(result);
-                const token = credential.accessToken;
-                const user = result.user;
-                console.log("Google Sign-In Success!");
-                console.log("Token:", token);
-                console.log("User:", user);
-                Swal.fire({
-                    title: "Google Login Successful!",
-                    icon: "success",
-                    text: `Welcome, ${user.email}!`,
-                }).then((result) => {
-                    if (result.isConfirmed) { setTimeout(() => { window.location.href = '/welcome.html' }, 1000) }
-                });
+                showSuccess("Google Login Successful!", `Welcome, ${user.email}`)
+                    .then((result) => {
+                        if (result.isConfirmed) { setTimeout(() => { window.location.href = '/todo.html' }, 1000) }
+                    });
             })
             .catch((error) => {
                 showError("Google Sign-In Failed", error.message);
@@ -230,7 +221,7 @@ const delTodo = async (id) => {
 onAuthStateChanged(auth, (user) => {
     if (user) {
         console.log("User logged in:", user);
-        if (window.location.pathname === "/welcome.html") {
+        if (window.location.pathname === "/todo.html") {
             getTodos();
         }
     } else {
